@@ -1,9 +1,8 @@
 // Vercel Serverless Function
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-const BREVO_API_KEY =
-  "BREVO_API_KEY_REMOVED-Nkx6lVnRrd4bpaSl";
-const BREVO_LIST_ID = 49;
+const BREVO_API_KEY = process.env.BREVO_API_KEY;
+const BREVO_LIST_ID = parseInt(process.env.BREVO_LIST_ID || "49", 10);
 
 interface RequestBody {
   name: string;
@@ -26,6 +25,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res
       .status(405)
       .json({ success: false, error: "Method not allowed" });
+  }
+
+  // Validate API key exists
+  if (!BREVO_API_KEY) {
+    console.error("BREVO_API_KEY is not configured");
+    return res.status(500).json({
+      success: false,
+      error: "Server configuration error",
+    });
   }
 
   try {
