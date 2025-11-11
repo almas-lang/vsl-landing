@@ -73,7 +73,15 @@ export const LeadForm: React.FC<LeadFormProps> = ({
         }),
       });
 
-      const result = await response.json();
+      // Handle empty or invalid JSON responses
+      let result;
+      try {
+        const text = await response.text();
+        result = text ? JSON.parse(text) : { success: false, error: "Empty response from server" };
+      } catch (parseError) {
+        console.error("Failed to parse response:", parseError);
+        throw new Error("Server returned an invalid response. Please try again.");
+      }
 
       if (!result.success) {
         throw new Error(result.error || "Failed to submit form");

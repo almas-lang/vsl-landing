@@ -76,7 +76,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }),
     });
 
-    const data = await brevoResponse.json();
+    // Handle 204 No Content response (when contact is updated)
+    if (brevoResponse.status === 204) {
+      // Contact was updated successfully, generate a lead ID based on email
+      const leadId = email.split("@")[0] + "_" + Date.now();
+      return res.status(200).json({
+        success: true,
+        leadId,
+        message: "Contact updated successfully",
+      });
+    }
+
+    // Handle empty response from Brevo
+    const responseText = await brevoResponse.text();
+    let data;
+    try {
+      data = responseText ? JSON.parse(responseText) : {};
+    } catch (e) {
+      console.error("Failed to parse Brevo response:", responseText);
+      console.error("Response status:", brevoResponse.status);
+      throw new Error("Invalid response from Brevo API");
+    }
 
     if (!brevoResponse.ok) {
       console.error("Brevo API Error:", data);
@@ -85,7 +105,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (brevoResponse.status === 400 && data.code === "duplicate_parameter") {
         return res.status(200).json({
           success: true,
-          leadId: email.split("@")[0] + Date.now(),
+          leadId: email.split("@")[0] + "_" + Date.now(),
           message: "Contact already exists, updated successfully",
         });
       }
@@ -93,8 +113,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error(data.message || "Brevo API failed");
     }
 
-    // Generate lead ID
-    const leadId = data.id?.toString() || email.split("@")[0] + Date.now();
+    // Generate lead ID (for new contacts)
+    const leadId = data.id?.toString() || email.split("@")[0] + "_" + Date.now();
 
     return res.status(200).json({
       success: true,
