@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { TestimonialGrid } from "../components/TestimonialGrid";
@@ -12,12 +12,30 @@ import { content } from "../config/content";
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const modal = useModal();
   const [toast, setToast] = useState({
     isVisible: false,
     message: "",
     type: "info" as "success" | "error" | "info",
   });
+
+  // Capture UTM parameters when user lands on the page
+  useEffect(() => {
+    const utmParams = {
+      utm_source: searchParams.get("utm_source") || "",
+      utm_medium: searchParams.get("utm_medium") || "",
+      utm_campaign: searchParams.get("utm_campaign") || "",
+      utm_content: searchParams.get("utm_content") || "",
+      utm_term: searchParams.get("utm_term") || "",
+    };
+
+    // Only store if at least one UTM parameter exists
+    if (Object.values(utmParams).some((value) => value !== "")) {
+      localStorage.setItem("utm_params", JSON.stringify(utmParams));
+      console.log("UTM parameters captured:", utmParams);
+    }
+  }, [searchParams]);
 
   const showToast = (message: string, type: "success" | "error" | "info") => {
     setToast({ isVisible: true, message, type });

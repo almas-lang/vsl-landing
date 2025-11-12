@@ -41,9 +41,14 @@ export const LeadForm: React.FC<LeadFormProps> = ({
     setIsSubmitting(true);
 
     try {
+      // Get UTM parameters from localStorage
+      const storedUtms = localStorage.getItem("utm_params");
+      const utmParams = storedUtms ? JSON.parse(storedUtms) : {};
+
       // DEV MODE: Skip API call in development
       if (window.location.hostname === 'localhost') {
         console.log("DEV MODE: Form data:", data);
+        console.log("DEV MODE: UTM params:", utmParams);
         const mockLeadId = "dev_" + Date.now();
 
         localStorage.setItem(
@@ -70,6 +75,11 @@ export const LeadForm: React.FC<LeadFormProps> = ({
           name: data.name,
           email: data.email,
           phone: "+91" + data.phone,
+          utm_source: utmParams.utm_source || "",
+          utm_medium: utmParams.utm_medium || "",
+          utm_campaign: utmParams.utm_campaign || "",
+          utm_content: utmParams.utm_content || "",
+          utm_term: utmParams.utm_term || "",
         }),
       });
 
