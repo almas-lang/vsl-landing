@@ -22,12 +22,18 @@ export const Home: React.FC = () => {
 
   // Capture UTM parameters when user lands on the page
   useEffect(() => {
+    // Get Meta's actual tracking parameters (hsa_*)
+    const metaCampaign = searchParams.get("hsa_cam") || "";
+    const metaAdSet = searchParams.get("hsa_grp") || "";
+    const metaAd = searchParams.get("hsa_ad") || "";
+
     const utmParams = {
       utm_source: searchParams.get("utm_source") || "",
       utm_medium: searchParams.get("utm_medium") || "",
-      utm_campaign: searchParams.get("utm_campaign") || "",
-      utm_content: searchParams.get("utm_content") || "",
-      utm_term: searchParams.get("utm_term") || "",
+      // Use Meta's actual IDs if custom UTM params aren't set
+      utm_campaign: searchParams.get("utm_campaign") || metaCampaign,
+      utm_content: searchParams.get("utm_content") || metaAd,
+      utm_term: searchParams.get("utm_term") || metaAdSet,
     };
 
     // Only store if at least one UTM parameter exists
