@@ -64,10 +64,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Generate lead ID first (we'll use this for the watch link)
     const tempLeadId = email.split("@")[0] + "_" + Date.now();
 
-    // Generate watch link
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : req.headers.origin || 'https://ld.xperiencewave.com';
+    // Generate watch link - always use production domain
+    const baseUrl = 'https://ld.xperiencewave.com';
     const watchLink = `${baseUrl}/watch?lead_id=${tempLeadId}`;
 
     // Call Brevo API
