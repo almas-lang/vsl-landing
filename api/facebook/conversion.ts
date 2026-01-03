@@ -59,7 +59,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         fbp,
         fbc
       },
-      event_source_url: event_source_url || 'https://ld.xperiencewave.com',
+      event_source_url: event_source_url || 'https://xperiencewave.com/vsltraining',
       action_source: 'website'
     };
 

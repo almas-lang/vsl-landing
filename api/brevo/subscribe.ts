@@ -8,6 +8,12 @@ interface RequestBody {
   name: string;
   email: string;
   phone: string;
+  employmentStatus?: string;
+  yearsOfExperience?: string;
+  monthlySalary?: string;
+  qualified?: boolean;
+  qualificationReason?: string;
+  qualificationCategory?: string;
   utm_source?: string;
   utm_medium?: string;
   utm_campaign?: string;
@@ -42,7 +48,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { name, email, phone, utm_source, utm_medium, utm_campaign, utm_content, utm_term } = req.body as RequestBody;
+    const {
+      name,
+      email,
+      phone,
+      employmentStatus,
+      yearsOfExperience,
+      monthlySalary,
+      qualified,
+      qualificationReason,
+      qualificationCategory,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term
+    } = req.body as RequestBody;
 
     // Validation
     if (!email || !name || !phone) {
@@ -65,8 +86,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const tempLeadId = email.split("@")[0] + "_" + Date.now();
 
     // Generate watch link - always use production domain
-    const baseUrl = 'https://ld.xperiencewave.com';
+    const baseUrl = 'https://xperiencewave.com/vsltraining';
     const watchLink = `${baseUrl}/watch?lead_id=${tempLeadId}`;
+
+    // Prepare attributes object with qualification data
+    const attributes: Record<string, any> = {
+      FIRSTNAME: name.trim(),
+      SMS: phone.trim(),
+      whatsapp: phone.trim(),
+      WATCH_LINK: watchLink,
+      UTM_SOURCE: utm_source || "",
+      UTM_MEDIUM: utm_medium || "",
+      UTM_CAMPAIGN: utm_campaign || "",
+      UTM_CONTENT: utm_content || "",
+      UTM_TERM: utm_term || "",
+    };
+
+    // Add qualification fields if provided
+    if (employmentStatus) {
+      attributes.EMPLOYMENT_STATUS = employmentStatus;
+    }
+    if (yearsOfExperience) {
+      attributes.YEARS_OF_EXPERIENCE = yearsOfExperience;
+    }
+    if (monthlySalary) {
+      attributes.MONTHLY_SALARY = monthlySalary;
+    }
+    if (qualified !== undefined) {
+      attributes.QUALIFIED = qualified ? "yes" : "no";
+    }
+    if (qualificationReason) {
+      attributes.QUALIFICATION_REASON = qualificationReason;
+    }
+    if (qualificationCategory) {
+      attributes.QUALIFICATION_CATEGORY = qualificationCategory;
+    }
 
     // Call Brevo API
     const brevoResponse = await fetch("https://api.brevo.com/v3/contacts", {
@@ -78,17 +132,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
       body: JSON.stringify({
         email: email.toLowerCase().trim(),
-        attributes: {
-          FIRSTNAME: name.trim(),
-          SMS: phone.trim(),
-          whatsapp: phone.trim(),
-          WATCH_LINK: watchLink,
-          UTM_SOURCE: utm_source || "",
-          UTM_MEDIUM: utm_medium || "",
-          UTM_CAMPAIGN: utm_campaign || "",
-          UTM_CONTENT: utm_content || "",
-          UTM_TERM: utm_term || "",
-        },
+        attributes,
         listIds: [BREVO_LIST_ID],
         updateEnabled: true,
       }),
