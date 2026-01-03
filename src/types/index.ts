@@ -26,3 +26,21 @@ export interface TrackingEvent {
   event: string;
   data?: Record<string, any>;
 }
+
+export interface ApplyFormData {
+  linkedinUrl: string;
+  currentRole: string;
+  currentCompany: string;
+  targetRole: string;
+  targetSalary: string;
+  blockingIssue: string;
+  whyImportant: string;
+  investmentReadiness: string;
+  timeline: string;
+}
+
+export interface QualificationResult {
+  qualified: boolean;
+  reason?: string;
+  category?: string;
+}
