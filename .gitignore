@@ -24,6 +24,9 @@ dist-ssr
 *.sw?
 .vercel
 
+# Large video files
+public/testimonials/*.mp4
+public/testimonials/*.MP4
 
 node_modules/
 .env
