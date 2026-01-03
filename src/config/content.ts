@@ -68,5 +68,8 @@ export const content = {
       terms: "/terms",
       refund: "/refund"
     }
+  },
+  disqualified: {
+    careerComebackPlaybookUrl: "#"
   }
 };
