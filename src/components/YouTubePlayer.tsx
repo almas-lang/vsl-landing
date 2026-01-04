@@ -17,6 +17,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
 }) => {
   const [isReady, setIsReady] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [hasUserClicked, setHasUserClicked] = useState(false);
   const playerRef = useRef<YTPlayer | null>(null);
 
   // Detect mobile devices (including Android, iOS, and mobile browsers)
@@ -28,7 +29,8 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     width: "100%",
     height: "100%",
     playerVars: {
-      autoplay: 0,
+      autoplay: 1, // Enable autoplay
+      mute: 1, // Start muted for autoplay to work
       controls: 1,
       rel: 0,
       modestbranding: 1,
@@ -44,8 +46,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     playerRef.current = event.target;
     setIsReady(true);
 
-    // Ensure video is paused on load
-    event.target.pauseVideo();
+    // Video will autoplay muted due to playerVars above
   };
 
   const handleStateChange: YouTubeProps["onStateChange"] = (event) => {
@@ -57,8 +58,8 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     // 3 (buffering)
     // 5 (video cued)
 
-    if (event.data === 1 && !hasStarted) {
-      // Video started playing for the first time
+    if (event.data === 1 && !hasStarted && hasUserClicked) {
+      // Video started playing after user clicked (not autoplay)
       setHasStarted(true);
       onPlay?.();
     }
@@ -71,7 +72,21 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
 
   const handlePlayClick = () => {
     if (playerRef.current && isReady) {
+      // Mark that user has clicked
+      setHasUserClicked(true);
+      setHasStarted(true);
+
+      // Restart video from beginning
+      playerRef.current.seekTo(0, true);
+
+      // Unmute the video
+      playerRef.current.unMute();
+
+      // Play the video
       playerRef.current.playVideo();
+
+      // Call onPlay callback
+      onPlay?.();
     }
   };
 
@@ -91,8 +106,8 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     {/* Cover YouTube logo in bottom right corner */}
     <div className="absolute bottom-0 right-0 w-24 h-12 bg-gradient-to-l from-black/80 to-transparent pointer-events-none" />
     
-    {/* Custom play overlay - only show on desktop devices */}
-    {!isMobile && isReady && !hasStarted && (
+    {/* Custom play overlay - show until user clicks, even during muted autoplay */}
+    {isReady && !hasUserClicked && (
       <button
         onClick={handlePlayClick}
         className="absolute inset-0 bg-black bg-opacity-30 hover:bg-opacity-20 transition-all flex items-center justify-center group z-10"
