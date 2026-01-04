@@ -2,6 +2,9 @@ export interface LeadFormData {
   name: string;
   email: string;
   phone: string;
+  employmentStatus: string;
+  yearsOfExperience: string;
+  monthlySalary: string;
 }
 
 export interface BrevoContact {
@@ -25,4 +28,22 @@ export interface BrevoResponse {
 export interface TrackingEvent {
   event: string;
   data?: Record<string, any>;
+}
+
+export interface QualificationResult {
+  qualified: boolean;
+  reason: string;
+  category: string;
+}
+
+export interface ApplyFormData {
+  linkedinUrl: string;
+  currentRole: string;
+  currentCompany: string;
+  targetRole: string;
+  targetSalary: string;
+  blockingIssue: string;
+  whyImportant: string;
+  investmentReadiness: string;
+  timeline: string;
 }

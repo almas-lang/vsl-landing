@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "./ui/Button";
 import { content } from "../config/content";
-import type { LeadFormData } from "../types";
+import type { LeadFormData, QualificationResult } from "../types";
 
 const schema = z.object({
   name: z.string().min(4, "Name must be at least 4 characters"),
@@ -14,10 +14,13 @@ const schema = z.object({
     .min(10, "Phone number must be exactly 10 digits")
     .max(10, "Phone number must be exactly 10 digits")
     .regex(/^\d{10}$/, "Please enter a valid 10-digit phone number"),
+  employmentStatus: z.string().min(1, "Please select your employment status"),
+  yearsOfExperience: z.string().min(1, "Please select your years of experience"),
+  monthlySalary: z.string().min(1, "Please select your monthly salary range"),
 });
 
 interface LeadFormProps {
-  onSuccess: (leadId: string) => void;
+  onSuccess: (leadId: string, qualificationResult: QualificationResult) => void;
   onError: (message: string) => void;
   onCancel: () => void;
 }
@@ -37,10 +40,59 @@ export const LeadForm: React.FC<LeadFormProps> = ({
     resolver: zodResolver(schema),
   });
 
+  // Check if user qualifies based on employment, experience, and salary
+  const checkQualification = (data: LeadFormData): QualificationResult => {
+    const isEmployed = data.employmentStatus === "yes";
+    const hasExperience = data.yearsOfExperience === "2_to_5" || data.yearsOfExperience === "5_plus";
+    const hasSalary = data.monthlySalary === "50k_to_1lakh" || data.monthlySalary === "1lakh_plus";
+
+    // Qualified if: employed + 2+ years + 50k+ salary
+    if (isEmployed && hasExperience && hasSalary) {
+      return {
+        qualified: true,
+        reason: "meets_all_criteria",
+        category: "qualified"
+      };
+    }
+
+    // Determine disqualification reason
+    if (!isEmployed) {
+      return {
+        qualified: false,
+        reason: "not_employed",
+        category: "employment"
+      };
+    }
+
+    if (!hasExperience) {
+      return {
+        qualified: false,
+        reason: "insufficient_experience",
+        category: "experience"
+      };
+    }
+
+    if (!hasSalary) {
+      return {
+        qualified: false,
+        reason: "insufficient_salary",
+        category: "salary"
+      };
+    }
+
+    return {
+      qualified: false,
+      reason: "general_disqualification",
+      category: "general"
+    };
+  };
+
   const onSubmit = async (data: LeadFormData) => {
     setIsSubmitting(true);
 
     try {
+      // Check qualification
+      const qualificationResult = checkQualification(data);
       // Get UTM parameters from localStorage
       const storedUtms = localStorage.getItem("utm_params");
       const utmParams = storedUtms ? JSON.parse(storedUtms) : {};
@@ -48,6 +100,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
       // DEV MODE: Skip API call in development
       if (window.location.hostname === 'localhost') {
         console.log("DEV MODE: Form data:", data);
+        console.log("DEV MODE: Qualification result:", qualificationResult);
         console.log("DEV MODE: UTM params:", utmParams);
         const mockLeadId = "dev_" + Date.now();
 
@@ -61,7 +114,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
         );
 
         setTimeout(() => {
-          onSuccess(mockLeadId);
+          onSuccess(mockLeadId, qualificationResult);
         }, 1000);
         return;
       }
@@ -107,6 +160,40 @@ export const LeadForm: React.FC<LeadFormProps> = ({
         })
       );
 
+      // Save to Google Sheets
+      try {
+        await fetch("/api/sheets/append", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            action: "create",
+            data: {
+              email: data.email,
+              name: data.name,
+              phone: "+91" + data.phone,
+              employmentStatus: data.employmentStatus,
+              yearsOfExperience: data.yearsOfExperience,
+              monthlySalary: data.monthlySalary,
+              qualified: qualificationResult.qualified,
+              qualificationReason: qualificationResult.reason,
+              qualificationCategory: qualificationResult.category,
+              utm_source: utmParams.utm_source || "",
+              utm_medium: utmParams.utm_medium || "",
+              utm_campaign: utmParams.utm_campaign || "",
+              utm_content: utmParams.utm_content || "",
+              utm_term: utmParams.utm_term || "",
+              stage: "lead"
+            }
+          })
+        });
+        console.log("✅ Lead data saved to Google Sheets");
+      } catch (sheetsError) {
+        console.error("Failed to save to Google Sheets:", sheetsError);
+        // Don't fail the form submission if Sheets fails
+      }
+
       // Track lead event
       if (window.fbq) {
         window.fbq("track", "Lead", {
@@ -115,7 +202,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
         });
       }
 
-      onSuccess(result.leadId);
+      onSuccess(result.leadId, qualificationResult);
     } catch (error: any) {
       console.error("Form submission error:", error);
       onError(error.message || "Something went wrong. Please try again.");
@@ -125,27 +212,17 @@ export const LeadForm: React.FC<LeadFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-8">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-          {content.modal.headline}{" "}
-          <span className="text-brand-red">
-            {content.modal.headlineHighlight}
-          </span>{" "}
-          {content.modal.headlineEnd}
-        </h2>
-      </div>
-
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 md:space-y-6 p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-sm">
       {/* Name Field */}
       <div>
-        <label htmlFor="name" className="block text-gray-700 font-medium mb-2">
+        <label htmlFor="name" className="block text-sm md:text-base text-gray-700 font-medium mb-2">
           Name
         </label>
         <input
           {...register("name")}
           id="name"
           type="text"
-          className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-2 transition ${
+          className={`w-full px-3 py-2.5 md:px-4 md:py-3 text-base rounded-lg border-2 focus:outline-none focus:ring-2 transition ${
             errors.name
               ? "border-red-300 focus:border-red-500 focus:ring-red-200"
               : "border-gray-200 focus:border-brand-purple focus:ring-purple-200"
@@ -155,7 +232,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
           aria-describedby={errors.name ? "name-error" : undefined}
         />
         {errors.name && (
-          <p id="name-error" className="mt-1 text-sm text-red-600" role="alert">
+          <p id="name-error" className="mt-1.5 text-xs md:text-sm text-red-600" role="alert">
             {errors.name.message}
           </p>
         )}
@@ -163,14 +240,14 @@ export const LeadForm: React.FC<LeadFormProps> = ({
 
       {/* Email Field */}
       <div>
-        <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
+        <label htmlFor="email" className="block text-sm md:text-base text-gray-700 font-medium mb-2">
           Email address
         </label>
         <input
           {...register("email")}
           id="email"
           type="email"
-          className={`w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-2 transition ${
+          className={`w-full px-3 py-2.5 md:px-4 md:py-3 text-base rounded-lg border-2 focus:outline-none focus:ring-2 transition ${
             errors.email
               ? "border-red-300 focus:border-red-500 focus:ring-red-200"
               : "border-gray-200 focus:border-brand-purple focus:ring-purple-200"
@@ -182,7 +259,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
         {errors.email && (
           <p
             id="email-error"
-            className="mt-1 text-sm text-red-600"
+            className="mt-1.5 text-xs md:text-sm text-red-600"
             role="alert"
           >
             {errors.email.message}
@@ -192,19 +269,19 @@ export const LeadForm: React.FC<LeadFormProps> = ({
 
       {/* Phone Field */}
       <div>
-        <label htmlFor="phone" className="block text-gray-700 font-medium mb-2">
+        <label htmlFor="phone" className="block text-sm md:text-base text-gray-700 font-medium mb-2">
           Mobile number
         </label>
         <div className="flex gap-2">
-          <div className="flex items-center px-4 py-3 bg-gray-100 border-2 border-gray-200 rounded-lg">
-            <span className="text-gray-700 font-medium">+91</span>
+          <div className="flex items-center px-3 py-2.5 md:px-4 md:py-3 bg-gray-100 border-2 border-gray-200 rounded-lg">
+            <span className="text-sm md:text-base text-gray-700 font-medium">+91</span>
           </div>
           <input
             {...register("phone")}
             id="phone"
             type="tel"
             maxLength={10}
-            className={`flex-1 px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-2 transition ${
+            className={`flex-1 px-3 py-2.5 md:px-4 md:py-3 text-base rounded-lg border-2 focus:outline-none focus:ring-2 transition ${
               errors.phone
                 ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                 : "border-gray-200 focus:border-brand-purple focus:ring-purple-200"
@@ -212,8 +289,8 @@ export const LeadForm: React.FC<LeadFormProps> = ({
             placeholder="0000000000"
             aria-invalid={errors.phone ? "true" : "false"}
             aria-describedby={errors.phone ? "phone-error" : undefined}
-            onKeyPress={(e) => {
-              if (!/[0-9]/.test(e.key)) {
+            onKeyDown={(e) => {
+              if (!/[0-9]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
                 e.preventDefault();
               }
             }}
@@ -222,10 +299,124 @@ export const LeadForm: React.FC<LeadFormProps> = ({
         {errors.phone && (
           <p
             id="phone-error"
-            className="mt-1 text-sm text-red-600"
+            className="mt-1.5 text-xs md:text-sm text-red-600"
             role="alert"
           >
             {errors.phone.message}
+          </p>
+        )}
+      </div>
+
+      {/* Employment Status */}
+      <div>
+        <label htmlFor="employmentStatus" className="block text-sm md:text-base text-gray-700 font-medium mb-2">
+          {content.qualifying.employmentStatus.label}
+        </label>
+        <div className="relative">
+          <select
+            {...register("employmentStatus")}
+            id="employmentStatus"
+            className={`w-full px-3 py-2.5 md:px-4 md:py-3 text-base rounded-lg border-2 focus:outline-none focus:ring-2 transition appearance-none bg-white pr-10 ${
+              errors.employmentStatus
+                ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                : "border-gray-200 focus:border-brand-purple focus:ring-purple-200"
+            }`}
+            style={{ color: register("employmentStatus").value ? 'inherit' : '#9CA3AF' }}
+            aria-invalid={errors.employmentStatus ? "true" : "false"}
+            aria-describedby={errors.employmentStatus ? "employment-error" : undefined}
+          >
+            <option value="" className="text-gray-400">Select an option</option>
+            {content.qualifying.employmentStatus.options.map((option) => (
+              <option key={option.value} value={option.value} className="text-gray-900">
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </div>
+        {errors.employmentStatus && (
+          <p id="employment-error" className="mt-1.5 text-xs md:text-sm text-red-600" role="alert">
+            {errors.employmentStatus.message}
+          </p>
+        )}
+      </div>
+
+      {/* Years of Experience */}
+      <div>
+        <label htmlFor="yearsOfExperience" className="block text-sm md:text-base text-gray-700 font-medium mb-2">
+          {content.qualifying.yearsOfExperience.label}
+        </label>
+        <div className="relative">
+          <select
+            {...register("yearsOfExperience")}
+            id="yearsOfExperience"
+            className={`w-full px-3 py-2.5 md:px-4 md:py-3 text-base rounded-lg border-2 focus:outline-none focus:ring-2 transition appearance-none bg-white pr-10 ${
+              errors.yearsOfExperience
+                ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                : "border-gray-200 focus:border-brand-purple focus:ring-purple-200"
+            }`}
+            style={{ color: register("yearsOfExperience").value ? 'inherit' : '#9CA3AF' }}
+            aria-invalid={errors.yearsOfExperience ? "true" : "false"}
+            aria-describedby={errors.yearsOfExperience ? "experience-error" : undefined}
+          >
+            <option value="" className="text-gray-400">Select an option</option>
+            {content.qualifying.yearsOfExperience.options.map((option) => (
+              <option key={option.value} value={option.value} className="text-gray-900">
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </div>
+        {errors.yearsOfExperience && (
+          <p id="experience-error" className="mt-1.5 text-xs md:text-sm text-red-600" role="alert">
+            {errors.yearsOfExperience.message}
+          </p>
+        )}
+      </div>
+
+      {/* Monthly Salary */}
+      <div>
+        <label htmlFor="monthlySalary" className="block text-sm md:text-base text-gray-700 font-medium mb-2">
+          {content.qualifying.monthlySalary.label}
+        </label>
+        <div className="relative">
+          <select
+            {...register("monthlySalary")}
+            id="monthlySalary"
+            className={`w-full px-3 py-2.5 md:px-4 md:py-3 text-base rounded-lg border-2 focus:outline-none focus:ring-2 transition appearance-none bg-white pr-10 ${
+              errors.monthlySalary
+                ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                : "border-gray-200 focus:border-brand-purple focus:ring-purple-200"
+            }`}
+            style={{ color: register("monthlySalary").value ? 'inherit' : '#9CA3AF' }}
+            aria-invalid={errors.monthlySalary ? "true" : "false"}
+            aria-describedby={errors.monthlySalary ? "salary-error" : undefined}
+          >
+            <option value="" className="text-gray-400">Select an option</option>
+            {content.qualifying.monthlySalary.options.map((option) => (
+              <option key={option.value} value={option.value} className="text-gray-900">
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </div>
+        {errors.monthlySalary && (
+          <p id="salary-error" className="mt-1.5 text-xs md:text-sm text-red-600" role="alert">
+            {errors.monthlySalary.message}
           </p>
         )}
       </div>
@@ -236,20 +427,27 @@ export const LeadForm: React.FC<LeadFormProps> = ({
         variant="primary"
         size="lg"
         isLoading={isSubmitting}
-        className="w-full"
+        className="w-full text-base md:text-lg"
       >
         {content.modal.cta}
       </Button>
       <button
         type="button"
         onClick={onCancel}
-        className="w-full text-gray-600 hover:text-gray-800 font-medium"
+        className="w-full text-sm md:text-base text-gray-600 hover:text-gray-800 font-medium transition-colors py-2"
       >
         Cancel
       </button>
 
+      {/* Important disclaimer */}
+      <div className="text-[11px] sm:text-xs text-gray-600 leading-relaxed text-center pt-3 border-t border-gray-200">
+        <p className="font-medium mb-2">
+          <span className="font-semibold">Important:</span> This training is for UX/UI/Product designers earning 6+ LPA with 2+ years experience. If you're a student, unemployed, or looking for job placement services – this won't be relevant for you.
+        </p>
+      </div>
+
       {/* Consent text */}
-      <div className="text-xs text-gray-500 leading-relaxed text-center">
+      <div className="text-[10px] sm:text-xs text-gray-500 leading-relaxed text-center">
         {content.modal.consent}
       </div>
     </form>

@@ -1,24 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { TestimonialGrid } from "../components/TestimonialGrid";
 import { CTA } from "../components/CTA";
-import { Modal } from "../components/ui/Modal";
-import { Toast } from "../components/ui/Toast";
-import { LeadForm } from "../components/LeadForm";
-import { useModal } from "../hooks/useModal";
 import { content } from "../config/content";
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const modal = useModal();
-  const [toast, setToast] = useState({
-    isVisible: false,
-    message: "",
-    type: "info" as "success" | "error" | "info",
-  });
 
   // Capture UTM parameters when user lands on the page
   useEffect(() => {
@@ -42,23 +32,6 @@ export const Home: React.FC = () => {
       console.log("UTM parameters captured:", utmParams);
     }
   }, [searchParams]);
-
-  const showToast = (message: string, type: "success" | "error" | "info") => {
-    setToast({ isVisible: true, message, type });
-  };
-
-  const handleLeadSuccess = (leadId: string) => {
-  showToast('Registration successful! Redirecting to training...', 'success');
-
-  setTimeout(() => {
-    // Add flag to indicate this is a new lead
-    navigate(`/watch?lead_id=${leadId}&utm_source=landing&utm_medium=form&new_lead=true`);
-  }, 1500);
-};
-
-  const handleLeadError = (message: string) => {
-    showToast(message, "error");
-  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -113,7 +86,7 @@ export const Home: React.FC = () => {
               </div>
 
               {/* CTA Button */}
-              <CTA onClick={modal.open} text={content.hero.cta} />
+              <CTA onClick={() => navigate('/getstarted')} text={content.hero.cta} />
             </div>
           </div>
         </section>
@@ -125,23 +98,6 @@ export const Home: React.FC = () => {
       </main>
 
       <Footer />
-
-      {/* Lead Capture Modal */}
-      <Modal isOpen={modal.isOpen} onClose={modal.close} size="md">
-        <LeadForm
-          onSuccess={handleLeadSuccess}
-          onError={handleLeadError}
-          onCancel={modal.close}
-        />
-      </Modal>
-
-      {/* Toast Notifications */}
-      <Toast
-        message={toast.message}
-        type={toast.type}
-        isVisible={toast.isVisible}
-        onClose={() => setToast({ ...toast, isVisible: false })}
-      />
     </div>
   );
 };
