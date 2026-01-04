@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/Button";
+import { trackConversionAPI } from "../lib/track";
 import type { ApplyFormData, QualificationResult } from "../types";
 
 const schema = z.object({
@@ -99,7 +100,11 @@ export const ApplyForm: React.FC<ApplyFormProps> = ({ onSuccess, onError }) => {
       };
     }
 
-    return { qualified: true };
+    return {
+      qualified: true,
+      reason: "meets_all_criteria",
+      category: "qualified"
+    };
   };
 
   const onSubmit = async (data: ApplyFormData) => {
@@ -158,11 +163,22 @@ export const ApplyForm: React.FC<ApplyFormProps> = ({ onSuccess, onError }) => {
         })
       );
 
-      // Track application submission
+      // Track application submission (Pixel)
       if (window.fbq) {
         window.fbq("track", "SubmitApplication", {
           content_name: "Application Form",
           qualified: qualificationResult.qualified,
+        });
+        console.log("✅ Pixel: SubmitApplication event fired");
+      }
+
+      // Track application submission (Conversion API)
+      if (leadData) {
+        trackConversionAPI("SubmitApplication", leadData.email, undefined, {
+          content_name: "Application Form",
+          qualified: qualificationResult.qualified,
+          investment_readiness: data.investmentReadiness,
+          timeline: data.timeline,
         });
       }
 
@@ -220,22 +236,29 @@ export const ApplyForm: React.FC<ApplyFormProps> = ({ onSuccess, onError }) => {
         <label htmlFor="currentRole" className="block text-gray-700 font-medium mb-2 text-sm md:text-base">
           What is your Current Role <span className="text-red-500">*</span>
         </label>
-        <select
-          {...register("currentRole")}
-          id="currentRole"
-          className={`w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border-2 focus:outline-none focus:ring-2 transition text-sm md:text-base ${
-            errors.currentRole
-              ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-              : "border-gray-200 focus:border-brand-purple focus:ring-purple-200"
-          }`}
-        >
-          <option value="">Select your current role</option>
-          {roleOptions.map((role) => (
-            <option key={role} value={role}>
-              {role}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            {...register("currentRole")}
+            id="currentRole"
+            className={`w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border-2 focus:outline-none focus:ring-2 transition appearance-none bg-white pr-10 text-sm md:text-base ${
+              errors.currentRole
+                ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                : "border-gray-200 focus:border-brand-purple focus:ring-purple-200"
+            }`}
+          >
+            <option value="">Select your current role</option>
+            {roleOptions.map((role) => (
+              <option key={role} value={role}>
+                {role}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </div>
         {errors.currentRole && (
           <p className="mt-1.5 text-xs md:text-sm text-red-600" role="alert">
             {errors.currentRole.message}
@@ -271,22 +294,29 @@ export const ApplyForm: React.FC<ApplyFormProps> = ({ onSuccess, onError }) => {
         <label htmlFor="targetRole" className="block text-gray-700 font-medium mb-2 text-sm md:text-base">
           What role are you targeting?  <span className="text-red-500">*</span>
         </label>
-        <select
-          {...register("targetRole")}
-          id="targetRole"
-          className={`w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border-2 focus:outline-none focus:ring-2 transition text-sm md:text-base ${
-            errors.targetRole
-              ? "border-red-300 focus:border-red-500 focus:ring-red-200"
-              : "border-gray-200 focus:border-brand-purple focus:ring-purple-200"
-          }`}
-        >
-          <option value="">Select your target role</option>
-          {targetRoleOptions.map((role) => (
-            <option key={role} value={role}>
-              {role}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            {...register("targetRole")}
+            id="targetRole"
+            className={`w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg border-2 focus:outline-none focus:ring-2 transition appearance-none bg-white pr-10 text-sm md:text-base ${
+              errors.targetRole
+                ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                : "border-gray-200 focus:border-brand-purple focus:ring-purple-200"
+            }`}
+          >
+            <option value="">Select your target role</option>
+            {targetRoleOptions.map((role) => (
+              <option key={role} value={role}>
+                {role}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </div>
+        </div>
         {errors.targetRole && (
           <p className="mt-1.5 text-xs md:text-sm text-red-600" role="alert">
             {errors.targetRole.message}

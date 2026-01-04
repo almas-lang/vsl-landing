@@ -14,7 +14,11 @@ export const Apply: React.FC = () => {
     // Track page view for /apply (Pixel)
     trackPageView("/apply", "Apply - Application Form");
 
-    // Track InitiateCheckout event (user is starting application)
+    // Get stored lead data for Conversion API
+    const storedLeadData = localStorage.getItem("lead_data");
+    const leadData = storedLeadData ? JSON.parse(storedLeadData) : null;
+
+    // Track InitiateCheckout event (Pixel)
     if (window.fbq) {
       window.fbq("track", "InitiateCheckout", {
         content_name: "Application Form",
@@ -24,9 +28,15 @@ export const Apply: React.FC = () => {
       console.log("✅ Pixel: InitiateCheckout event fired (Application)");
     }
 
+    // Track InitiateCheckout event (Conversion API)
+    if (leadData) {
+      trackConversionAPI("InitiateCheckout", leadData.email, undefined, {
+        content_name: "Application Form",
+        lead_id: leadId,
+      });
+    }
+
     // Track PageView via Conversion API
-    const storedLeadData = localStorage.getItem("lead_data");
-    const leadData = storedLeadData ? JSON.parse(storedLeadData) : null;
     if (leadData) {
       trackConversionAPI("PageView", leadData.email, undefined, {
         content_name: "Apply Page",

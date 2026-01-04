@@ -2,30 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Footer } from "../components/Footer";
 import { YouTubePlayer } from "../components/YouTubePlayer";
-import {
-  CalendlyWidget,
-  openCalendlyPopup,
-} from "../components/CalendlyWidget";
 import { Button } from "../components/ui/Button";
 import { Toast } from "../components/ui/Toast";
 import {
   trackVideoView,
-  trackCalendlyBooking,
   trackPageView,
   trackConversionAPI,
 } from "../lib/track";
 import { content } from "../config/content";
 
 const YOUTUBE_VIDEO_ID = import.meta.env.VITE_YOUTUBE_VIDEO_ID || "GVl8_yg_HJM";
-const CALENDLY_URL =
-  import.meta.env.VITE_CALENDLY_URL ||
-  "https://calendly.com/team-xperiencewave/xw-strategy";
 
 export const Watch: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [hasTrackedView, setHasTrackedView] = useState(false);
-  const [showCalendly, setShowCalendly] = useState(false);
   const [toast, setToast] = useState({
     isVisible: false,
     message: "",
@@ -111,33 +102,12 @@ export const Watch: React.FC = () => {
   };
 
   const handleVideoEnd = () => {
-    // Auto-show Calendly when video ends
-    setShowCalendly(true);
+    // Show message when video ends
     setToast({
       isVisible: true,
-      message: "Ready to take the next step? Book your strategy call below!",
+      message: "Ready to take the next step? Click the button below to apply!",
       type: "success",
     });
-  };
-
-  const handleOpenCalendly = () => {};
-
-  const handleCalendlyScheduled = () => {
-    trackCalendlyBooking({
-      lead_id: leadId,
-    });
-
-    setToast({
-      isVisible: true,
-      message:
-        "Call scheduled successfully! Check your email for confirmation.",
-      type: "success",
-    });
-
-    // Redirect to congratulations page
-    setTimeout(() => {
-      navigate("/congratulations");
-    }, 2000);
   };
 
   return (
@@ -159,10 +129,30 @@ export const Watch: React.FC = () => {
           <div className="text-center">
             <Button
               onClick={() => {
-                // Track the click
-                trackCalendlyBooking({ lead_id: leadId });
-                // Navigate to Calendly in same tab
-                window.location.href = CALENDLY_URL;
+                // Get stored lead data for Conversion API
+                const storedLeadData = localStorage.getItem("lead_data");
+                const leadData = storedLeadData ? JSON.parse(storedLeadData) : null;
+
+                // Track the click (Pixel)
+                if (window.fbq) {
+                  window.fbq("track", "InitiateCheckout", {
+                    content_name: "Application Form CTA",
+                    content_category: "Apply",
+                    lead_id: leadId,
+                  });
+                  console.log("✅ Pixel: InitiateCheckout event fired (Watch CTA)");
+                }
+
+                // Track the click (Conversion API)
+                if (leadData) {
+                  trackConversionAPI("InitiateCheckout", leadData.email, undefined, {
+                    content_name: "Application Form CTA",
+                    lead_id: leadId,
+                  });
+                }
+
+                // Navigate to Apply page with lead_id
+                navigate(`/apply${leadId ? `?lead_id=${leadId}` : ""}`);
               }}
               variant="primary"
               size="lg"
