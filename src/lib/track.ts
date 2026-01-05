@@ -32,12 +32,11 @@ export const trackGA4 = (eventName: string, parameters?: TrackingData) => {
 
 /**
  * Track page view
+ * Note: Facebook PageView is already fired in index.html on every page load,
+ * so we only track to GA4 here to avoid duplicate pixel events
  */
 export const trackPageView = (pagePath: string, pageTitle?: string) => {
-  // Facebook Pixel
-  trackFacebookPixel("PageView");
-
-  // Google Analytics 4
+  // Google Analytics 4 only (FB PageView already fires from index.html)
   trackGA4("page_view", {
     page_path: pagePath,
     page_title: pageTitle || document.title,
