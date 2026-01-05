@@ -33,3 +33,5 @@ build/
 .DS_Store
 *.log
 .vercel
+public/testimonials/*.mp4
+public/testimonials/*.MP4

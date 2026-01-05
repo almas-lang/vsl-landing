@@ -1,35 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Footer } from '../components/Footer';
 
 export const ApplyRejected: React.FC = () => {
   const [userName, setUserName] = useState<string>('');
+  const [userEmail, setUserEmail] = useState<string>('');
   const [rejectionReason, setRejectionReason] = useState<{
     category?: string;
     reason?: string;
   }>({});
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Scroll to top when page loads
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Get user name from localStorage
+    // Get user data from localStorage
     const leadFormData = localStorage.getItem('lead_form_data');
+    let email = '';
+    let name = '';
+
     if (leadFormData) {
       try {
         const formData = JSON.parse(leadFormData);
-        setUserName(formData.name || '');
+        name = formData.name || '';
+        email = formData.email || '';
+        setUserName(name);
+        setUserEmail(email);
       } catch (error) {
         console.error('Error parsing lead data:', error);
       }
     }
 
     // Get rejection reason
+    let qualification = { category: '', reason: '' };
     const applyQualification = localStorage.getItem('apply_qualification');
     if (applyQualification) {
       try {
-        const qualification = JSON.parse(applyQualification);
+        qualification = JSON.parse(applyQualification);
         setRejectionReason({
           category: qualification.category,
           reason: qualification.reason,
@@ -38,7 +45,32 @@ export const ApplyRejected: React.FC = () => {
         console.error('Error parsing qualification data:', error);
       }
     }
+
+    // Update Google Sheet to mark as apply_rejected (for sending resources)
+    if (email) {
+      updateSheetStatus(email, qualification.category, qualification.reason);
+    }
   }, []);
+
+  const updateSheetStatus = async (email: string, category?: string, reason?: string) => {
+    try {
+      await fetch('/api/sheets/append', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update',
+          data: {
+            email,
+            stage: 'apply_rejected',
+            applyQualified: false,
+            applyQualificationReason: reason || category || 'not_qualified',
+          },
+        }),
+      });
+    } catch (error) {
+      console.error('Error updating sheet:', error);
+    }
+  };
 
   // Get personalized messaging based on rejection category
   const getMessage = () => {
@@ -97,7 +129,8 @@ export const ApplyRejected: React.FC = () => {
                 Free Resources to Help You Grow
               </h2>
               <p className="text-base md:text-lg text-gray-700 mb-6">
-                We've curated some resources that can help you prepare for the next step in your career:
+                We've curated some resources that can help you prepare for the next step in your career.
+                {userEmail && <span className="font-medium"> We'll send these to {userEmail}:</span>}
               </p>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
