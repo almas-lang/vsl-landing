@@ -196,8 +196,6 @@ async function updateRow(sheets: any, rowIndex: number, leadData: LeadData): Pro
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log("📊 Google Sheets API called");
-
   // CORS headers
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -212,12 +210,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ success: false, error: "Method not allowed" });
   }
 
-  // Validate configuration
-  console.log("📊 Checking env vars...");
-  console.log("📊 SPREADSHEET_ID:", SPREADSHEET_ID ? "SET" : "MISSING");
-  console.log("📊 CLIENT_EMAIL:", GOOGLE_SHEETS_CLIENT_EMAIL ? "SET" : "MISSING");
-  console.log("📊 PRIVATE_KEY:", GOOGLE_SHEETS_PRIVATE_KEY ? "SET (length: " + GOOGLE_SHEETS_PRIVATE_KEY.length + ")" : "MISSING");
-
   if (!SPREADSHEET_ID || !GOOGLE_SHEETS_CLIENT_EMAIL || !GOOGLE_SHEETS_PRIVATE_KEY) {
     console.error("Google Sheets is not configured");
     return res.status(500).json({
@@ -228,7 +220,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const { action, data } = req.body as RequestBody;
-    console.log("📊 Action:", action, "Email:", data?.email);
 
     if (!data.email) {
       return res.status(400).json({
@@ -237,16 +228,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Get Google Sheets client
-    console.log("📊 Getting Google Sheets client...");
     const sheets = await getGoogleSheetsClient();
-    console.log("📊 Got Sheets client successfully");
 
     if (action === 'create') {
-      // Check if email already exists
-      console.log("📊 Checking if email exists...");
       const existingRow = await findRowByEmail(sheets, data.email);
-      console.log("📊 Email check result:", existingRow);
 
       if (existingRow) {
         // Update existing row instead
