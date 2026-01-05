@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Footer } from '../components/Footer';
+import { trackConversionAPI } from '../lib/track';
 
 export const ApplyRejected: React.FC = () => {
   const [userName, setUserName] = useState<string>('');
@@ -44,6 +45,14 @@ export const ApplyRejected: React.FC = () => {
       } catch (error) {
         console.error('Error parsing qualification data:', error);
       }
+    }
+
+    // Track rejection event via Conversion API
+    if (email) {
+      trackConversionAPI('ApplicationRejected', email, undefined, {
+        rejection_category: qualification.category,
+        rejection_reason: qualification.reason,
+      });
     }
 
     // Update Google Sheet to mark as apply_rejected (for sending resources)
