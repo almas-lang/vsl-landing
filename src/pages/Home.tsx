@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { TestimonialGrid } from "../components/TestimonialGrid";
-import { CTA } from "../components/CTA";
 import { content } from "../config/content";
 
 export const Home: React.FC = () => {
@@ -69,9 +68,11 @@ export const Home: React.FC = () => {
           <div className="container mx-auto px-4">
             <div className="text-center space-y-8">
               {/* Qualifier */}
-              <p className="text-[15px] lg:text-2xl text-gray-700 font-bold">
-                {content.hero.qualifier}
-              </p>
+              <div className="inline-block bg-gradient-to-r from-brand-purple to-brand-red rounded-full px-6 py-3 md:px-8 md:py-4">
+                <p className="text-[15px] lg:text-2xl text-white font-bold">
+                  {content.hero.qualifier}
+                </p>
+              </div>
 
               {/* Main Headline */}
               <h1 className="text-[25px]/[1.3] md:text-4xl lg:text-[48px]/[1.1] font-bold text-gray-900 ">
@@ -79,14 +80,58 @@ export const Home: React.FC = () => {
               </h1>
 
               {/* Subheadline */}
-              <div className="text-sm md:text-xl text-brand-purple px-4 md:px-12">
+              <div className="text-sm md:text-xl text-gray-500 px-4 md:px-12">
                 <p className="font-semibold md:font-semibold leading-snug md:leading-snug">
                   {content.hero.subheadline1}
                 </p>
               </div>
 
+            </div>
+          </div>
+        </section>
+
+        {/* Video Preview Section */}
+        <section className="py-8 md:py-12 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col items-center">
+              {/* Video Thumbnail */}
+              <div
+                className="relative w-full max-w-3xl cursor-pointer group"
+                onClick={() => navigate('/getstarted')}
+              >
+                <div className="relative rounded-xl md:rounded-2xl overflow-hidden shadow-xl">
+                  <img
+                    src="/video-thumbnail.png"
+                    alt="Free training video - How to move beyond Grunt Design Execution to 2X Pay, Influence & Recognition"
+                    className="w-full h-auto"
+                    onError={(e) => {
+                      // Fallback to a dark placeholder if image doesn't exist
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement?.classList.add('bg-gray-900');
+                      e.currentTarget.parentElement!.style.aspectRatio = '16/9';
+                    }}
+                  />
+                  {/* Play Button Overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/30 transition-colors">
+                    <div className="w-14 h-14 md:w-20 md:h-20 bg-brand-red rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                      <svg className="w-7 h-7 md:w-10 md:h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* CTA Button */}
-              <CTA onClick={() => navigate('/getstarted')} text={content.hero.cta} />
+              <button
+                onClick={() => navigate('/getstarted')}
+                className="mt-6 md:mt-8 bg-brand-red hover:bg-red-600 text-white font-semibold text-base md:text-lg px-8 md:px-10 py-3 md:py-4 rounded-full transition-colors shadow-lg inline-flex items-center gap-2"
+              >
+                Send me free training
+                <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
             </div>
           </div>
         </section>
