@@ -35,10 +35,16 @@ export const LeadForm: React.FC<LeadFormProps> = ({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<LeadFormData>({
     resolver: zodResolver(schema),
   });
+
+  // Watch select field values to update text color
+  const employmentStatusValue = watch("employmentStatus");
+  const yearsOfExperienceValue = watch("yearsOfExperience");
+  const monthlySalaryValue = watch("monthlySalary");
 
   // Check if user qualifies based on employment, experience, and salary
   const checkQualification = (data: LeadFormData): QualificationResult => {
@@ -194,13 +200,8 @@ export const LeadForm: React.FC<LeadFormProps> = ({
         // Don't fail the form submission if Sheets fails
       }
 
-      // Track lead event
-      if (window.fbq) {
-        window.fbq("track", "Lead", {
-          content_name: "VSL Webinar",
-          content_category: "Lead Generation",
-        });
-      }
+      // Note: Lead pixel event is fired on Watch page (with new_lead=true param)
+      // to avoid duplicate events
 
       onSuccess(result.leadId, qualificationResult);
     } catch (error: any) {
@@ -321,7 +322,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
                 ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                 : "border-gray-200 focus:border-brand-purple focus:ring-purple-200"
             }`}
-            style={{ color: register("employmentStatus").value ? 'inherit' : '#9CA3AF' }}
+            style={{ color: employmentStatusValue ? '#111827' : '#9CA3AF' }}
             aria-invalid={errors.employmentStatus ? "true" : "false"}
             aria-describedby={errors.employmentStatus ? "employment-error" : undefined}
           >
@@ -359,7 +360,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
                 ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                 : "border-gray-200 focus:border-brand-purple focus:ring-purple-200"
             }`}
-            style={{ color: register("yearsOfExperience").value ? 'inherit' : '#9CA3AF' }}
+            style={{ color: yearsOfExperienceValue ? '#111827' : '#9CA3AF' }}
             aria-invalid={errors.yearsOfExperience ? "true" : "false"}
             aria-describedby={errors.yearsOfExperience ? "experience-error" : undefined}
           >
@@ -397,7 +398,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
                 ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                 : "border-gray-200 focus:border-brand-purple focus:ring-purple-200"
             }`}
-            style={{ color: register("monthlySalary").value ? 'inherit' : '#9CA3AF' }}
+            style={{ color: monthlySalaryValue ? '#111827' : '#9CA3AF' }}
             aria-invalid={errors.monthlySalary ? "true" : "false"}
             aria-describedby={errors.monthlySalary ? "salary-error" : undefined}
           >

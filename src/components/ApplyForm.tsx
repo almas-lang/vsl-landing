@@ -184,7 +184,8 @@ export const ApplyForm: React.FC<ApplyFormProps> = ({ onSuccess, onError }) => {
 
       // Route based on qualification
       if (qualificationResult.qualified) {
-        navigate("/congratulations");
+        // Redirect to booking page with embedded Cal.com
+        navigate("/book");
       } else {
         // Navigate to apply rejected page
         navigate("/apply-rejected");
@@ -201,11 +202,17 @@ export const ApplyForm: React.FC<ApplyFormProps> = ({ onSuccess, onError }) => {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 md:space-y-8 max-w-3xl mx-auto p-4 md:p-6">
       <div className="text-center mb-8">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">
-          Complete Your Application
+          One Last Step Before You Book Your Call
         </h2>
-        <p className="text-base md:text-lg text-gray-600">
-          Help us understand your career goals and how we can best support you
+        <p className="text-base md:text-lg text-gray-600 mb-4">
+          Help us understand your goals so we can make your strategy session truly valuable
         </p>
+        <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm md:text-base font-medium">
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
+          <span>Complete this form → Pick your time slot</span>
+        </div>
       </div>
 
       {/* 1. LinkedIn URL */}
@@ -533,8 +540,12 @@ export const ApplyForm: React.FC<ApplyFormProps> = ({ onSuccess, onError }) => {
         isLoading={isSubmitting}
         className="w-full text-sm md:text-base"
       >
-        Submit Application
+        {isSubmitting ? "Processing..." : "Continue to Book Your Call →"}
       </Button>
+
+      <p className="text-center text-sm text-gray-500 mt-3">
+        After submitting, you'll be able to choose your preferred time slot
+      </p>
     </form>
   );
 };
