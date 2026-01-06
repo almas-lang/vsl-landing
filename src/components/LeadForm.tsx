@@ -95,7 +95,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
       const utmParams = storedUtms ? JSON.parse(storedUtms) : {};
 
       // DEV MODE: Set to true to skip API calls, false to test with real APIs
-      const SKIP_API_IN_DEV = true;
+      const SKIP_API_IN_DEV = false;
 
       if (SKIP_API_IN_DEV && window.location.hostname === 'localhost') {
         console.log("DEV MODE: Form data:", data);
@@ -136,6 +136,12 @@ export const LeadForm: React.FC<LeadFormProps> = ({
           name: data.name,
           email: data.email,
           phone: "+91" + data.phone,
+          employmentStatus: data.employmentStatus,
+          yearsOfExperience: data.yearsOfExperience,
+          monthlySalary: data.monthlySalary || "",
+          qualified: qualificationResult.qualified,
+          qualificationReason: qualificationResult.reason,
+          qualificationCategory: qualificationResult.category,
           utm_source: utmParams.utm_source || "",
           utm_medium: utmParams.utm_medium || "",
           utm_campaign: utmParams.utm_campaign || "",

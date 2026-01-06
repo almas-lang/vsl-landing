@@ -5,7 +5,15 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
-    open: true
+    open: true,
+    proxy: {
+      // Proxy API calls to production Vercel deployment for local testing
+      '/api': {
+        target: 'https://ld.xperiencewave.com',
+        changeOrigin: true,
+        secure: true,
+      }
+    }
   },
   build: {
     outDir: 'dist',

@@ -126,6 +126,33 @@ export const ApplyForm: React.FC<ApplyFormProps> = ({ onSuccess, onError }) => {
       const storedUtms = localStorage.getItem("utm_params");
       const utmParams = storedUtms ? JSON.parse(storedUtms) : {};
 
+      // Get lead form data for Brevo update
+      const storedFormData = localStorage.getItem("lead_form_data");
+      const formData = storedFormData ? JSON.parse(storedFormData) : {};
+
+      // Update Brevo with apply-stage qualification
+      try {
+        await fetch("/api/brevo/subscribe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name || "",
+            email: leadData.email,
+            phone: formData.phone || "",
+            applyQualified: qualificationResult.qualified,
+            applyQualificationReason: qualificationResult.reason,
+            applyQualificationCategory: qualificationResult.category,
+            stage: qualificationResult.qualified ? "applied_qualified" : "applied_disqualified",
+          }),
+        });
+        console.log("✅ Brevo: Apply qualification updated");
+      } catch (brevoError) {
+        console.error("Failed to update Brevo:", brevoError);
+        // Don't block the flow if Brevo fails
+      }
+
       // Submit to Google Sheets
       await fetch("/api/sheets/append", {
         method: "POST",

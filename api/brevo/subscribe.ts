@@ -8,12 +8,20 @@ interface RequestBody {
   name: string;
   email: string;
   phone: string;
+  // Stage 1: Lead form qualification
   employmentStatus?: string;
   yearsOfExperience?: string;
   monthlySalary?: string;
   qualified?: boolean;
   qualificationReason?: string;
   qualificationCategory?: string;
+  // Stage 2: Apply form qualification
+  applyQualified?: boolean;
+  applyQualificationReason?: string;
+  applyQualificationCategory?: string;
+  // Funnel stage tracking
+  stage?: string; // 'lead', 'watched', 'applied', 'booked'
+  // UTM params
   utm_source?: string;
   utm_medium?: string;
   utm_campaign?: string;
@@ -58,6 +66,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       qualified,
       qualificationReason,
       qualificationCategory,
+      applyQualified,
+      applyQualificationReason,
+      applyQualificationCategory,
+      stage,
       utm_source,
       utm_medium,
       utm_campaign,
@@ -102,7 +114,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       UTM_TERM: utm_term || "",
     };
 
-    // Add qualification fields if provided
+    // Stage 1: Lead form qualification fields
     if (employmentStatus) {
       attributes.EMPLOYMENT_STATUS = employmentStatus;
     }
@@ -113,13 +125,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       attributes.MONTHLY_SALARY = monthlySalary;
     }
     if (qualified !== undefined) {
-      attributes.QUALIFIED = qualified ? "yes" : "no";
+      attributes.LEAD_QUALIFIED = qualified ? "yes" : "no";
     }
     if (qualificationReason) {
-      attributes.QUALIFICATION_REASON = qualificationReason;
+      attributes.LEAD_QUALIFICATION_REASON = qualificationReason;
     }
     if (qualificationCategory) {
-      attributes.QUALIFICATION_CATEGORY = qualificationCategory;
+      attributes.LEAD_QUALIFICATION_CATEGORY = qualificationCategory;
+    }
+
+    // Stage 2: Apply form qualification fields
+    if (applyQualified !== undefined) {
+      attributes.APPLY_QUALIFIED = applyQualified ? "yes" : "no";
+    }
+    if (applyQualificationReason) {
+      attributes.APPLY_QUALIFICATION_REASON = applyQualificationReason;
+    }
+    if (applyQualificationCategory) {
+      attributes.APPLY_QUALIFICATION_CATEGORY = applyQualificationCategory;
+    }
+
+    // Funnel stage tracking
+    if (stage) {
+      attributes.FUNNEL_STAGE = stage;
     }
 
     // Call Brevo API
