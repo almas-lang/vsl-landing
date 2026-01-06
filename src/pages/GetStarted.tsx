@@ -15,6 +15,14 @@ export const GetStarted: React.FC = () => {
   });
 
   useEffect(() => {
+    // Force reload when navigating back via browser back button (bfcache)
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    };
+    window.addEventListener('pageshow', handlePageShow);
+
     // Track page view for /getstarted (Pixel)
     trackPageView("/getstarted", "Get Started");
 
@@ -38,6 +46,10 @@ export const GetStarted: React.FC = () => {
 
     // Scroll to top when page loads
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow);
+    };
   }, []);
 
   const showToast = (message: string, type: "success" | "error" | "info") => {

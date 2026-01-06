@@ -70,26 +70,26 @@ export const Disqualified: React.FC = () => {
             </Link>
           </div>
 
-          {/* Main Content Card */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 md:p-10">
+          {/* Main Content Card - Dark Theme with Brand Colors */}
+          <div className="bg-gray-900 rounded-2xl shadow-2xl p-6 md:p-10">
             {/* Title */}
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center leading-tight">
+            <h1 className="text-2xl md:text-3xl font-bold text-white mb-6 text-center leading-tight">
               {content.title}
             </h1>
 
             {/* Personalized Greeting */}
             <div className="mb-8 text-left">
-              <p className="text-lg md:text-xl text-gray-800 mb-6">
+              <p className="text-lg md:text-xl text-gray-200 mb-6">
                 Hi {userName ? <span className="font-semibold text-brand-purple">{userName}</span> : 'there'},
               </p>
 
-              <p className="text-base md:text-lg text-gray-700 mb-4">
-                Our <span className="font-semibold">Pi-Design Career System</span> is specifically designed for:
+              <p className="text-base md:text-lg text-gray-300 mb-4">
+                Our <span className="font-semibold text-white">Pi-Design Career System</span> is specifically designed for:
               </p>
 
               <ul className="space-y-2 mb-6 ml-4">
                 {content.targetAudience.map((item: string, index: number) => (
-                  <li key={index} className="flex items-start gap-3 text-base md:text-lg text-gray-700">
+                  <li key={index} className="flex items-start gap-3 text-base md:text-lg text-gray-300">
                     <svg className="w-6 h-6 text-brand-purple mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
@@ -98,77 +98,89 @@ export const Disqualified: React.FC = () => {
                 ))}
               </ul>
 
-              <p className="text-base md:text-lg text-gray-800 mb-2 font-semibold">
+              <p className="text-base md:text-lg text-gray-200 mb-2 font-semibold">
                 {content.notMeetMessage}
               </p>
 
-              <p className="text-base md:text-lg text-gray-800 font-semibold text-brand-purple">
+              <p className="text-base md:text-lg font-semibold text-brand-purple">
                 {content.helpMessage}
               </p>
             </div>
 
             {/* Divider */}
-            <div className="border-t border-gray-200 my-8"></div>
+            <div className="border-t border-gray-700 my-8"></div>
 
             {/* CTA Section */}
-            <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-6 md:p-8 mb-8">
-              <p className="text-base md:text-lg text-gray-700 mb-6">
+            <div className="bg-brand-purple/10 rounded-xl p-6 md:p-8 mb-8 border border-brand-purple/30">
+              <p className="text-base md:text-lg text-gray-200 mb-6">
                 {content.cta.description}
               </p>
               <a
                 href={content.cta.link}
-                className="inline-block bg-brand-purple hover:bg-purple-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors text-sm md:text-base shadow-md hover:shadow-lg"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-brand-red hover:bg-red-500 text-white font-semibold px-8 py-3 rounded-lg transition-colors text-sm md:text-base shadow-lg"
               >
-                {content.cta.buttonText} →
+                {content.cta.buttonText}
               </a>
             </div>
 
             {/* Additional Resources */}
-            <div className="bg-gray-50 rounded-xl p-6 md:p-8">
-              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">
+            <div className="bg-gray-800/50 rounded-xl p-6 md:p-8 border border-gray-700">
+              <h3 className="text-lg md:text-xl font-semibold text-white mb-4">
                 What happens next?
               </h3>
-              <p className="text-base md:text-lg text-gray-700 mb-4">
+              <p className="text-base md:text-lg text-gray-300 mb-4">
                 We'll also send you free resources via email to help you build toward senior roles.
               </p>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-brand-purple mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm md:text-base text-gray-700">
+                  <p className="text-sm md:text-base text-gray-300">
                     Free career growth resources tailored to your current stage
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-brand-purple mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm md:text-base text-gray-700">
+                  <p className="text-sm md:text-base text-gray-300">
                     Priority notification when we launch programs suited to your profile
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-brand-purple mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm md:text-base text-gray-700">
+                  <p className="text-sm md:text-base text-gray-300">
                     Weekly design career tips and industry insights
                   </p>
                 </div>
               </div>
             </div>
 
+            {/* CTA Button */}
+            <div className="text-center mt-8">
+              <Link
+                to="/"
+                className="inline-block bg-brand-red hover:bg-red-500 text-white font-semibold px-8 py-3 rounded-lg transition-colors text-sm md:text-base shadow-lg"
+              >
+                Return to Home
+              </Link>
+            </div>
+
             {/* Signature */}
             <div className="mt-8 text-center">
-              <p className="text-base md:text-lg text-gray-700 font-medium">
+              <p className="text-base md:text-lg text-gray-300 font-medium">
                 — Team Xperience Wave
               </p>
             </div>
           </div>
 
           {/* Additional Help */}
-          <div className="mt-8 text-center space-y-4">
+          <div className="mt-8 text-center">
             <p className="text-sm text-gray-600">
               Have questions?{' '}
               <a
@@ -178,12 +190,6 @@ export const Disqualified: React.FC = () => {
                 Contact our team
               </a>
             </p>
-            <Link
-              to="/"
-              className="inline-block text-sm text-gray-500 hover:text-gray-700 font-medium"
-            >
-              ← Back to Home
-            </Link>
           </div>
         </div>
       </main>

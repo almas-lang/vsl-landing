@@ -207,11 +207,26 @@ export const ApplyForm: React.FC<ApplyFormProps> = ({ onSuccess, onError }) => {
         <p className="text-base md:text-lg text-gray-600 mb-4">
           Help us understand your goals so we can make your strategy session truly valuable
         </p>
-        <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm md:text-base font-medium">
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-          <span>Complete this form → Pick your time slot</span>
+        {/* Progress Steps */}
+        <div className="flex items-center justify-center gap-2 md:gap-4">
+          {/* Step 1 - Active */}
+          <div className="flex items-center gap-1.5 md:gap-2">
+            <div className="w-8 h-8 md:w-10 md:h-10 min-w-[32px] min-h-[32px] md:min-w-[40px] md:min-h-[40px] rounded-full bg-brand-purple text-white flex items-center justify-center text-sm md:text-base font-semibold shrink-0">
+              1
+            </div>
+            <span className="text-sm md:text-base font-medium text-gray-900 whitespace-nowrap">Complete form</span>
+          </div>
+
+          {/* Connector */}
+          <div className="w-6 md:w-12 h-0.5 bg-gray-300 shrink-0"></div>
+
+          {/* Step 2 - Inactive */}
+          <div className="flex items-center gap-1.5 md:gap-2">
+            <div className="w-8 h-8 md:w-10 md:h-10 min-w-[32px] min-h-[32px] md:min-w-[40px] md:min-h-[40px] rounded-full bg-gray-200 text-gray-400 flex items-center justify-center text-sm md:text-base font-semibold shrink-0">
+              2
+            </div>
+            <span className="text-sm md:text-base font-medium text-gray-400 whitespace-nowrap">Pick time slot</span>
+          </div>
         </div>
       </div>
 

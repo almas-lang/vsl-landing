@@ -11,6 +11,14 @@ export const Home: React.FC = () => {
 
   // Capture UTM parameters when user lands on the page
   useEffect(() => {
+    // Force reload when navigating back via browser back button (bfcache)
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        window.location.reload();
+      }
+    };
+    window.addEventListener('pageshow', handlePageShow);
+
     // Get Meta's actual tracking parameters (hsa_*)
     const metaCampaign = searchParams.get("hsa_cam") || "";
     const metaAdSet = searchParams.get("hsa_grp") || "";
@@ -30,6 +38,10 @@ export const Home: React.FC = () => {
       localStorage.setItem("utm_params", JSON.stringify(utmParams));
       console.log("UTM parameters captured:", utmParams);
     }
+
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow);
+    };
   }, [searchParams]);
 
   return (

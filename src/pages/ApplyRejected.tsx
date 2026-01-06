@@ -108,45 +108,45 @@ export const ApplyRejected: React.FC = () => {
             </Link>
           </div>
 
-          {/* Main Content Card */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 md:p-10">
+          {/* Main Content Card - Dark Theme with Brand Colors */}
+          <div className="bg-gray-900 rounded-2xl shadow-2xl p-6 md:p-10">
             {/* Title */}
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center leading-tight">
-              Thank you for your interest, {userName}
+            <h1 className="text-2xl md:text-3xl font-bold text-white mb-6 text-center leading-tight">
+              Thank you for your interest{userName ? `, ${userName}` : ''}
             </h1>
 
             {/* Message */}
             <div className="mb-8">
-              <div className="bg-amber-50 border-l-4 border-amber-400 p-4 md:p-6 rounded-r-lg mb-6">
-                <p className="text-base md:text-lg text-gray-800">
+              <div className="bg-amber-900/30 border-l-4 border-amber-400 p-4 md:p-6 rounded-r-lg mb-6">
+                <p className="text-base md:text-lg text-gray-200">
                   {getMessage()}
                 </p>
               </div>
 
-              <p className="text-base md:text-lg text-gray-700 mb-4">
+              <p className="text-base md:text-lg text-gray-300 mb-4">
                 While you may not be the right fit for our intensive Pi-Design Career System at this moment,
                 we still want to support your design career journey.
               </p>
             </div>
 
             {/* Divider */}
-            <div className="border-t border-gray-200 my-8"></div>
+            <div className="border-t border-gray-700 my-8"></div>
 
             {/* Resources Section */}
-            <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-6 md:p-8 mb-8">
-              <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4">
+            <div className="bg-brand-purple/10 rounded-xl p-6 md:p-8 mb-8 border border-brand-purple/30">
+              <h2 className="text-xl md:text-2xl font-semibold text-white mb-4">
                 Free Resources to Help You Grow
               </h2>
-              <p className="text-base md:text-lg text-gray-700 mb-6">
+              <p className="text-base md:text-lg text-gray-300 mb-6">
                 We've curated some resources that can help you prepare for the next step in your career.
-                {userEmail && <span className="font-medium"> We'll send these to {userEmail}:</span>}
+                {userEmail && <span className="font-medium text-brand-purple"> We'll send these to {userEmail}:</span>}
               </p>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <svg className="w-6 h-6 text-brand-purple mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm md:text-base text-gray-700">
+                  <p className="text-sm md:text-base text-gray-300">
                     Weekly design career tips and industry insights delivered to your inbox
                   </p>
                 </div>
@@ -154,7 +154,7 @@ export const ApplyRejected: React.FC = () => {
                   <svg className="w-6 h-6 text-brand-purple mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm md:text-base text-gray-700">
+                  <p className="text-sm md:text-base text-gray-300">
                     Free guides on building your design portfolio and personal brand
                   </p>
                 </div>
@@ -162,7 +162,7 @@ export const ApplyRejected: React.FC = () => {
                   <svg className="w-6 h-6 text-brand-purple mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm md:text-base text-gray-700">
+                  <p className="text-sm md:text-base text-gray-300">
                     Priority notification when we launch programs suited to your profile
                   </p>
                 </div>
@@ -170,36 +170,36 @@ export const ApplyRejected: React.FC = () => {
             </div>
 
             {/* What's Next Section */}
-            <div className="bg-gray-50 rounded-xl p-6 md:p-8 mb-6">
-              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4">
+            <div className="bg-gray-800/50 rounded-xl p-6 md:p-8 mb-6 border border-gray-700">
+              <h3 className="text-lg md:text-xl font-semibold text-white mb-4">
                 When might this program be right for you?
               </h3>
               <div className="space-y-3">
                 {rejectionReason.category === 'investment' || rejectionReason.category === 'both' ? (
                   <div className="flex items-start gap-3">
-                    <svg className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-5 h-5 text-brand-purple mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                     </svg>
-                    <p className="text-sm md:text-base text-gray-700">
+                    <p className="text-sm md:text-base text-gray-300">
                       When you're ready to invest ₹60-80K in your career transformation
                     </p>
                   </div>
                 ) : null}
                 {rejectionReason.category === 'timeline' || rejectionReason.category === 'both' ? (
                   <div className="flex items-start gap-3">
-                    <svg className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-5 h-5 text-brand-purple mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                     </svg>
-                    <p className="text-sm md:text-base text-gray-700">
+                    <p className="text-sm md:text-base text-gray-300">
                       When you can commit to a 90-day intensive transformation process
                     </p>
                   </div>
                 ) : null}
                 <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-brand-purple mt-1 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm md:text-base text-gray-700">
+                  <p className="text-sm md:text-base text-gray-300">
                     Feel free to reapply once your situation changes
                   </p>
                 </div>
@@ -210,7 +210,7 @@ export const ApplyRejected: React.FC = () => {
             <div className="text-center">
               <Link
                 to="/"
-                className="inline-block bg-brand-purple hover:bg-purple-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors text-sm md:text-base shadow-md hover:shadow-lg"
+                className="inline-block bg-brand-red hover:bg-red-500 text-white font-semibold px-8 py-3 rounded-lg transition-colors text-sm md:text-base shadow-lg"
               >
                 Return to Home
               </Link>
@@ -218,7 +218,7 @@ export const ApplyRejected: React.FC = () => {
 
             {/* Signature */}
             <div className="mt-8 text-center">
-              <p className="text-base md:text-lg text-gray-700 font-medium">
+              <p className="text-base md:text-lg text-gray-300 font-medium">
                 — Team Xperience Wave
               </p>
             </div>
@@ -229,7 +229,7 @@ export const ApplyRejected: React.FC = () => {
             <p className="text-sm text-gray-600">
               Have questions?{' '}
               <a
-                href="mailto:help@xperiencewave.com"
+                href="mailto:team@xperiencewave.com"
                 className="text-brand-purple hover:text-purple-700 font-medium"
               >
                 Contact our team
