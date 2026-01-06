@@ -46,9 +46,9 @@ export const Disqualified: React.FC = () => {
       notMeetMessage: "Based on your responses, you don't meet these criteria yet.",
       helpMessage: "But we want to help you get there.",
       cta: {
-        description: "Download our free \"Career Comeback Playbook\"",
-        link: siteContent.disqualified.careerComebackPlaybookUrl,
-        buttonText: "Download Free Playbook"
+        description: "Download our free \"Designers Current Capability Assessment\"",
+        link: siteContent.disqualified.designerCapabilityAssessmentUrl,
+        buttonText: "Download Free Assessment"
       }
     };
   };
@@ -168,16 +168,22 @@ export const Disqualified: React.FC = () => {
           </div>
 
           {/* Additional Help */}
-          <div className="mt-8 text-center">
+          <div className="mt-8 text-center space-y-4">
             <p className="text-sm text-gray-600">
               Have questions?{' '}
               <a
-                href="mailto:help@xperiencewave.com"
+                href="mailto:team@xperiencewave.com"
                 className="text-brand-purple hover:text-purple-700 font-medium"
               >
                 Contact our team
               </a>
             </p>
+            <Link
+              to="/"
+              className="inline-block text-sm text-gray-500 hover:text-gray-700 font-medium"
+            >
+              ← Back to Home
+            </Link>
           </div>
         </div>
       </main>

@@ -16,7 +16,7 @@ const schema = z.object({
     .regex(/^\d{10}$/, "Please enter a valid 10-digit phone number"),
   employmentStatus: z.string().min(1, "Please select your employment status"),
   yearsOfExperience: z.string().min(1, "Please select your years of experience"),
-  monthlySalary: z.string().min(1, "Please select your monthly salary range"),
+  monthlySalary: z.string().optional(),
 });
 
 interface LeadFormProps {
@@ -46,14 +46,13 @@ export const LeadForm: React.FC<LeadFormProps> = ({
   const yearsOfExperienceValue = watch("yearsOfExperience");
   const monthlySalaryValue = watch("monthlySalary");
 
-  // Check if user qualifies based on employment, experience, and salary
+  // Check if user qualifies based on employment and experience (salary hidden for now)
   const checkQualification = (data: LeadFormData): QualificationResult => {
     const isEmployed = data.employmentStatus === "yes";
     const hasExperience = data.yearsOfExperience === "2_to_5" || data.yearsOfExperience === "5_plus";
-    const hasSalary = data.monthlySalary === "50k_to_1lakh" || data.monthlySalary === "1lakh_plus";
 
-    // Qualified if: employed + 2+ years + 50k+ salary
-    if (isEmployed && hasExperience && hasSalary) {
+    // Qualified if: employed + 2+ years experience
+    if (isEmployed && hasExperience) {
       return {
         qualified: true,
         reason: "meets_all_criteria",
@@ -78,14 +77,6 @@ export const LeadForm: React.FC<LeadFormProps> = ({
       };
     }
 
-    if (!hasSalary) {
-      return {
-        qualified: false,
-        reason: "insufficient_salary",
-        category: "salary"
-      };
-    }
-
     return {
       qualified: false,
       reason: "general_disqualification",
@@ -103,8 +94,10 @@ export const LeadForm: React.FC<LeadFormProps> = ({
       const storedUtms = localStorage.getItem("utm_params");
       const utmParams = storedUtms ? JSON.parse(storedUtms) : {};
 
-      // DEV MODE: Skip API call in development
-      if (window.location.hostname === 'localhost') {
+      // DEV MODE: Set to true to skip API calls, false to test with real APIs
+      const SKIP_API_IN_DEV = true;
+
+      if (SKIP_API_IN_DEV && window.location.hostname === 'localhost') {
         console.log("DEV MODE: Form data:", data);
         console.log("DEV MODE: Qualification result:", qualificationResult);
         console.log("DEV MODE: UTM params:", utmParams);
@@ -116,6 +109,15 @@ export const LeadForm: React.FC<LeadFormProps> = ({
             leadId: mockLeadId,
             email: data.email,
             timestamp: new Date().toISOString(),
+          })
+        );
+
+        // Save form data for Cal.com pre-fill
+        localStorage.setItem(
+          "lead_form_data",
+          JSON.stringify({
+            name: data.name,
+            phone: "+91" + data.phone,
           })
         );
 
@@ -163,6 +165,15 @@ export const LeadForm: React.FC<LeadFormProps> = ({
           leadId: result.leadId,
           email: data.email,
           timestamp: new Date().toISOString(),
+        })
+      );
+
+      // Save form data for Cal.com pre-fill
+      localStorage.setItem(
+        "lead_form_data",
+        JSON.stringify({
+          name: data.name,
+          phone: "+91" + data.phone,
         })
       );
 
@@ -384,8 +395,8 @@ export const LeadForm: React.FC<LeadFormProps> = ({
         )}
       </div>
 
-      {/* Monthly Salary */}
-      <div>
+      {/* Monthly Salary - Hidden for now */}
+      {/* <div>
         <label htmlFor="monthlySalary" className="block text-sm md:text-base text-gray-700 font-medium mb-2">
           {content.qualifying.monthlySalary.label}
         </label>
@@ -420,7 +431,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
             {errors.monthlySalary.message}
           </p>
         )}
-      </div>
+      </div> */}
 
       {/* Submit Button */}
       <Button

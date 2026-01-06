@@ -42,7 +42,7 @@ export const content = {
     }
   },
   disqualified: {
-    careerComebackPlaybookUrl: "https://your-playbook-url.com"
+    designerCapabilityAssessmentUrl: "https://drive.google.com/file/d/1Gh5B013xApIML717yzcTZNkgFhxXikQg/view?usp=drive_link"
   },
   watch: {
     cta: "Book strategy call"
