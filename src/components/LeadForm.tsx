@@ -107,6 +107,30 @@ export const LeadForm: React.FC<LeadFormProps> = ({
         })
       );
 
+      // Send to SalesHub
+      try {
+        await fetch("/api/saleshub/webhook", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: data.name,
+            email: data.email,
+            phone: "+91" + data.phone,
+            source: "landing_page",
+            stage: "lead",
+            utm_source: utmParams.utm_source || "",
+            utm_medium: utmParams.utm_medium || "",
+            utm_campaign: utmParams.utm_campaign || "",
+            utm_content: utmParams.utm_content || "",
+            utm_term: utmParams.utm_term || "",
+          }),
+        });
+        console.log("✅ SalesHub: Lead data sent");
+      } catch (saleshubError) {
+        console.error("Failed to send to SalesHub:", saleshubError);
+        // Don't fail the form submission if SalesHub fails
+      }
+
       // Track lead event
       if (window.fbq) {
         window.fbq("track", "Lead", {

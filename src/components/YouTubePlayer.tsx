@@ -17,6 +17,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
 }) => {
   const [isReady, setIsReady] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [isAutoplayMuted, setIsAutoplayMuted] = useState(true);
   const playerRef = useRef<YTPlayer | null>(null);
 
   // Detect mobile devices (including Android, iOS, and mobile browsers)
@@ -28,7 +29,8 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     width: "100%",
     height: "100%",
     playerVars: {
-      autoplay: 0,
+      autoplay: 1,
+      mute: 1,
       controls: 1,
       rel: 0,
       modestbranding: 1,
@@ -44,8 +46,7 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     playerRef.current = event.target;
     setIsReady(true);
 
-    // Ensure video is paused on load
-    event.target.pauseVideo();
+    // Video autoplays muted — no need to pause
   };
 
   const handleStateChange: YouTubeProps["onStateChange"] = (event) => {
@@ -71,7 +72,14 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
 
   const handlePlayClick = () => {
     if (playerRef.current && isReady) {
+      // Restart from beginning with volume
+      playerRef.current.seekTo(0, true);
+      playerRef.current.unMute();
+      playerRef.current.setVolume(100);
       playerRef.current.playVideo();
+      setIsAutoplayMuted(false);
+      setHasStarted(true);
+      onPlay?.();
     }
   };
 
@@ -91,8 +99,8 @@ export const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     {/* Cover YouTube logo in bottom right corner */}
     <div className="absolute bottom-0 right-0 w-24 h-12 bg-gradient-to-l from-black/80 to-transparent pointer-events-none" />
     
-    {/* Custom play overlay - only show on desktop devices */}
-    {!isMobile && isReady && !hasStarted && (
+    {/* Custom play overlay - show until user clicks play */}
+    {isReady && isAutoplayMuted && (
       <button
         onClick={handlePlayClick}
         className="absolute inset-0 bg-black bg-opacity-30 hover:bg-opacity-20 transition-all flex items-center justify-center group z-10"

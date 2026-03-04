@@ -150,7 +150,7 @@ export const Watch: React.FC = () => {
           {/* Badge */}
 
           {/* Video Section */}
-          <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8 mb-8">
+          <div className="mb-8">
             <YouTubePlayer
               videoId={YOUTUBE_VIDEO_ID}
               onPlay={handleVideoPlay}
