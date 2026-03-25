@@ -77,15 +77,15 @@ export const trackVideoView = (videoId: string, data?: TrackingData) => {
 };
 
 /**
- * Track Calendly booking
+ * Track booking CTA click
  */
-export const trackCalendlyBooking = (data?: TrackingData) => {
+export const trackBookingClick = (data?: TrackingData) => {
   trackFacebookPixel("Schedule", {
     content_name: "Strategy Call",
     ...data,
   });
 
-  trackGA4("schedule_appointment", {
+  trackGA4("booking_click", {
     appointment_type: "strategy_call",
     ...data,
   });
@@ -106,7 +106,7 @@ export default {
   trackPageView,
   trackLead,
   trackVideoView,
-  trackCalendlyBooking,
+  trackBookingClick,
   trackClick,
   trackFacebookPixel,
   trackGA4,

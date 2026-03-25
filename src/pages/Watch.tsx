@@ -3,30 +3,26 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "../components/Header";
 import { Footer } from "../components/Footer";
 import { YouTubePlayer } from "../components/YouTubePlayer";
-import {
-  CalendlyWidget,
-  openCalendlyPopup,
-} from "../components/CalendlyWidget";
 import { Button } from "../components/ui/Button";
 import { Toast } from "../components/ui/Toast";
 import {
   trackVideoView,
-  trackCalendlyBooking,
+  trackBookingClick,
   trackPageView,
   trackConversionAPI,
 } from "../lib/track";
 import { content } from "../config/content";
 
 const YOUTUBE_VIDEO_ID = import.meta.env.VITE_YOUTUBE_VIDEO_ID || "GVl8_yg_HJM";
-const CALENDLY_URL =
-  import.meta.env.VITE_CALENDLY_URL ||
-  "https://calendly.com/team-xperiencewave/xw-strategy";
+const BOOKING_URL =
+  import.meta.env.VITE_BOOKING_URL ||
+  "https://app.xperiencewave.com/book/design-career-strategy-call";
 
 export const Watch: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [hasTrackedView, setHasTrackedView] = useState(false);
-  const [showCalendly, setShowCalendly] = useState(false);
+  const [showBooking, setShowBooking] = useState(false);
   const [toast, setToast] = useState({
     isVisible: false,
     message: "",
@@ -112,8 +108,8 @@ export const Watch: React.FC = () => {
   };
 
   const handleVideoEnd = () => {
-    // Auto-show Calendly when video ends
-    setShowCalendly(true);
+    // Auto-show booking CTA when video ends
+    setShowBooking(true);
     setToast({
       isVisible: true,
       message: "Ready to take the next step? Book your strategy call below!",
@@ -121,24 +117,16 @@ export const Watch: React.FC = () => {
     });
   };
 
-  const handleOpenCalendly = () => {};
-
-  const handleCalendlyScheduled = () => {
-    trackCalendlyBooking({
-      lead_id: leadId,
-    });
-
-    setToast({
-      isVisible: true,
-      message:
-        "Call scheduled successfully! Check your email for confirmation.",
-      type: "success",
-    });
-
-    // Redirect to congratulations page
-    setTimeout(() => {
-      navigate("/congratulations");
-    }, 2000);
+  const buildBookingUrl = () => {
+    const url = new URL(BOOKING_URL);
+    if (leadId) url.searchParams.set("lead_id", leadId);
+    const utmSource = searchParams.get("utm_source");
+    const utmMedium = searchParams.get("utm_medium");
+    const utmCampaign = searchParams.get("utm_campaign");
+    if (utmSource) url.searchParams.set("utm_source", utmSource);
+    if (utmMedium) url.searchParams.set("utm_medium", utmMedium);
+    if (utmCampaign) url.searchParams.set("utm_campaign", utmCampaign);
+    return url.toString();
   };
 
   return (
@@ -162,10 +150,8 @@ export const Watch: React.FC = () => {
           <div className="text-center">
             <Button
               onClick={() => {
-                // Track the click
-                trackCalendlyBooking({ lead_id: leadId });
-                // Navigate to Calendly in same tab
-                window.location.href = CALENDLY_URL;
+                trackBookingClick({ lead_id: leadId });
+                window.location.href = buildBookingUrl();
               }}
               variant="primary"
               size="lg"
@@ -174,20 +160,6 @@ export const Watch: React.FC = () => {
               {content.watch.cta}
             </Button>
           </div>
-
-          {/* Inline Calendly (optional - shows after video or on demand) */}
-          {/* {showCalendly && (
-            <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-                Schedule Your Strategy Call
-              </h3>
-              <CalendlyWidget
-                url={CALENDLY_URL}
-                mode="inline"
-                onScheduled={handleCalendlyScheduled}
-              />
-            </div>
-          )} */}
         </div>
       </main>
 

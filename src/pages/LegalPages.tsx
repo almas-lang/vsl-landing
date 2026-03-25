@@ -169,7 +169,7 @@ export const Refund: React.FC = () => (
         <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">2. Strategy Call</h2>
         <p>
           The initial strategy call is complimentary. You may cancel or reschedule your appointment 
-          at any time through Calendly or by contacting us directly.
+          at any time through our booking page or by contacting us directly.
         </p>
       </section>
 
