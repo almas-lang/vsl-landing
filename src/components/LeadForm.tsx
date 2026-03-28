@@ -109,7 +109,7 @@ export const LeadForm: React.FC<LeadFormProps> = ({
 
       // Send to SalesHub
       try {
-        await fetch("/api/saleshub/webhook", {
+        const saleshubResponse = await fetch("/api/saleshub/webhook", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -125,7 +125,12 @@ export const LeadForm: React.FC<LeadFormProps> = ({
             utm_term: utmParams.utm_term || "",
           }),
         });
-        console.log("✅ SalesHub: Lead data sent");
+        if (!saleshubResponse.ok) {
+          const saleshubError = await saleshubResponse.text();
+          console.error("SalesHub webhook failed:", saleshubResponse.status, saleshubError);
+        } else {
+          console.log("✅ SalesHub: Lead data sent");
+        }
       } catch (saleshubError) {
         console.error("Failed to send to SalesHub:", saleshubError);
         // Don't fail the form submission if SalesHub fails
