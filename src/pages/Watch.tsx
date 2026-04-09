@@ -16,7 +16,7 @@ import { content } from "../config/content";
 const YOUTUBE_VIDEO_ID = import.meta.env.VITE_YOUTUBE_VIDEO_ID || "GVl8_yg_HJM";
 const BOOKING_URL =
   import.meta.env.VITE_BOOKING_URL ||
-  "https://app.xperiencewave.com/book/design-career-strategy-call";
+  "https://app.xperiencewave.com/book/strategy-call";
 
 export const Watch: React.FC = () => {
   const [searchParams] = useSearchParams();
