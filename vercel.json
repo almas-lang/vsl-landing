@@ -2,6 +2,23 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "redirects": [
+    {
+      "source": "/watch",
+      "destination": "https://xperiencewave.com/freetraining/watch",
+      "permanent": true
+    },
+    {
+      "source": "/congratulations",
+      "destination": "https://xperiencewave.com/freetraining/congratulations",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "destination": "https://xperiencewave.com/freetraining",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
